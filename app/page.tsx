@@ -17,7 +17,7 @@ import { Copy, TrendingUp, Shirt, Scissors, X, Plus, Lock, FileText, LogIn, LogO
 import { CONFIG, EMBROIDERY_SELL_TIERS, SCREEN_PRINT_MATRIX } from '@/lib/constants';
 import { formatCurrency } from '@/lib/formatters';
 import { calculateEmbroidery, findClosestTier, calculateItemWithGlobalTier } from '@/lib/calculations';
-import { getCurrentUser, setCurrentUser as setCurrentUserStorage, logout as logoutUser, login as loginUser, type User } from '@/lib/auth';
+import { getCurrentUser, setCurrentUser as setCurrentUserStorage, logout as logoutUser, login as loginUser, register as registerUser, needsRegistration as needsUserRegistration, type User } from '@/lib/auth';
 import { saveQuotation, getQuotations, deleteQuotation } from '@/lib/storage';
 import type { Provider, ScreenPrintOrderItem, OrderTotals, SavedQuotation, ScreenPrintResult } from '@/types/calculator';
 
@@ -26,8 +26,10 @@ export default function TextilePriceCalculator() {
   // 🔐 AUTH STATE
 // ============================================
   const [currentUser, setCurrentUserState] = useState<User | null>(null);
-  const [loginUsername, setLoginUsername] = useState<string>('');
+  const [loginEmail, setLoginEmail] = useState<string>('');
   const [loginPassword, setLoginPassword] = useState<string>('');
+  const [loginName, setLoginName] = useState<string>('');
+  const [isRegistering, setIsRegistering] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string>('');
 
 // ============================================
@@ -183,7 +185,7 @@ export default function TextilePriceCalculator() {
     designGroups.forEach((items, designKey) => {
       if (items.length > 0) {
         const firstItem = items[0];
-        let totalScreens = 0;
+    let totalScreens = 0;
         
         if (firstItem.colorsFront > 0) {
           totalScreens += firstItem.colorsFront;
@@ -326,15 +328,43 @@ export default function TextilePriceCalculator() {
   // 🔐 LOGIN FUNCTIONS
   // ============================================
   const handleLogin = () => {
-    const user = loginUser(loginUsername, loginPassword);
-    if (user) {
-      setCurrentUserStorage(user);
-      setCurrentUserState(user);
-      setLoginError('');
-      setLoginUsername('');
-      setLoginPassword('');
+    if (isRegistering) {
+      // Modo registro - crear contraseña
+      const result = registerUser(loginEmail, loginPassword, loginName);
+      if (result.success && result.user) {
+        setCurrentUserStorage(result.user);
+        setCurrentUserState(result.user);
+        setLoginError('');
+        setLoginEmail('');
+        setLoginPassword('');
+        setLoginName('');
+        setIsRegistering(false);
+        toast.success('Contraseña creada', {
+          description: 'Bienvenido! Tu cuenta ha sido configurada.',
+          duration: 3000,
+        });
+      } else {
+        setLoginError(result.message);
+      }
     } else {
-      setLoginError('Usuario o contraseña incorrectos');
+      // Modo login normal
+      const user = loginUser(loginEmail, loginPassword);
+      if (user) {
+        setCurrentUserStorage(user);
+        setCurrentUserState(user);
+        setLoginError('');
+        setLoginEmail('');
+        setLoginPassword('');
+        setIsRegistering(false);
+      } else {
+        // Verificar si necesita registro
+        if (loginEmail && needsUserRegistration(loginEmail)) {
+          setIsRegistering(true);
+          setLoginError('');
+        } else {
+          setLoginError('Email o contraseña incorrectos');
+        }
+      }
     }
   };
 
@@ -439,7 +469,7 @@ export default function TextilePriceCalculator() {
     
     // Aplicar hoodie fee si aplica
     let costPerPiece = printCost;
-    if (spIsHoodie) {
+      if (spIsHoodie) {
       costPerPiece += CONFIG.BULK_ITEM_FEE;
     }
     
@@ -533,9 +563,9 @@ export default function TextilePriceCalculator() {
     // Encontrar tier
     const tier = findClosestTier(embQuantity, Object.keys(EMBROIDERY_SELL_TIERS));
     let sellPrice = EMBROIDERY_SELL_TIERS[tier as keyof typeof EMBROIDERY_SELL_TIERS];
-    
+
     // Ajuste de gorra
-      if (embCapCost > CONFIG.EMB_BASE_CAP) {
+    if (embCapCost > CONFIG.EMB_BASE_CAP) {
       sellPrice += (embCapCost - CONFIG.EMB_BASE_CAP);
     }
     
@@ -545,10 +575,10 @@ export default function TextilePriceCalculator() {
       const extraThousands = Math.ceil(extraStitches / 1000);
       sellPrice += (extraThousands * CONFIG.EMB_EXTRA_1K);
     }
-    
+
     // Revenue
     const revenue = sellPrice * embQuantity;
-    
+
     // Digitizing
     let digitizing = 0;
     if (embNewLogo && embQuantity < CONFIG.DIGITIZING_FREE_QTY) {
@@ -782,28 +812,68 @@ export default function TextilePriceCalculator() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-2xl text-center">BlackOps Calculator</CardTitle>
-            <CardDescription className="text-center">Inicia sesión para continuar</CardDescription>
+            <CardTitle className="text-2xl text-center">Calculadora Customize It!</CardTitle>
+            <CardDescription className="text-center">
+              {isRegistering ? 'Crea tu contraseña para continuar' : 'Inicia sesión para continuar'}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {loginError && (
-              <Alert className="bg-red-50 border-red-200">
-                <AlertDescription className="text-red-800">{loginError}</AlertDescription>
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{loginError}</AlertDescription>
               </Alert>
             )}
+            
+            {isRegistering && (
+              <Alert className="bg-blue-50 border-blue-200">
+                <AlertCircle className="h-4 w-4 text-blue-600" />
+                <AlertDescription className="text-blue-800">
+                  Este email necesita crear una contraseña. Completa el formulario para continuar.
+                </AlertDescription>
+              </Alert>
+            )}
+            
             <div className="space-y-2">
-              <Label htmlFor="username">Usuario</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="username"
-                type="text"
-                value={loginUsername}
-                onChange={(e) => setLoginUsername(e.target.value)}
-                placeholder="admin o ecuador"
+                id="email"
+                type="email"
+                value={loginEmail}
+                onChange={(e) => {
+                  setLoginEmail(e.target.value);
+                  setLoginError('');
+                  // Verificar si necesita registro cuando cambia el email
+                  if (e.target.value && needsUserRegistration(e.target.value)) {
+                    setIsRegistering(true);
+                  } else if (!e.target.value) {
+                    setIsRegistering(false);
+                  }
+                }}
+                placeholder="info@custimizeitca.com"
                 onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+                disabled={isRegistering}
               />
             </div>
+            
+            {isRegistering && (
+              <div className="space-y-2">
+                <Label htmlFor="name">Nombre</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  value={loginName}
+                  onChange={(e) => setLoginName(e.target.value)}
+                  placeholder="Tu nombre completo"
+                  onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+                />
+              </div>
+            )}
+            
             <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
+              <Label htmlFor="password">
+                {isRegistering ? 'Nueva Contraseña' : 'Contraseña'}
+              </Label>
               <Input
                 id="password"
                 type="password"
@@ -812,11 +882,45 @@ export default function TextilePriceCalculator() {
                 placeholder="••••••••"
                 onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
               />
+              {isRegistering && (
+                <p className="text-xs text-[#6B7280]">
+                  Crea una contraseña segura para tu cuenta
+                </p>
+              )}
             </div>
-            <Button onClick={handleLogin} className="w-full" size="lg">
-              <LogIn className="w-4 h-4 mr-2" />
-              Iniciar Sesión
+            
+            <Button 
+              onClick={handleLogin} 
+              className="w-full bg-[#FF6B35] hover:bg-[#FF8C61] text-white" 
+              size="lg"
+            >
+              {isRegistering ? (
+                <>
+                  <Lock className="w-4 h-4 mr-2" />
+                  Crear Contraseña
+                </>
+              ) : (
+                <>
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Iniciar Sesión
+                </>
+              )}
             </Button>
+            
+            {isRegistering && (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setIsRegistering(false);
+                  setLoginError('');
+                  setLoginPassword('');
+                  setLoginName('');
+                }}
+                className="w-full"
+              >
+                Volver a Iniciar Sesión
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -1291,8 +1395,8 @@ export default function TextilePriceCalculator() {
                                     </span>
                                   </div>
                                 ))}
-                              </CardContent>
-                            </Card>
+                  </CardContent>
+                </Card>
                           )}
                           
                           {/* Sugerencias de Tiers (Mejor Precio) */}
@@ -1322,7 +1426,7 @@ export default function TextilePriceCalculator() {
                                       <span className="text-xs text-[#6B7280]">
                                         {opt.additional} pieza{opt.additional > 1 ? 's' : ''} más
                                       </span>
-                                    </div>
+              </div>
                                     <div className="flex flex-col items-end">
                                       <span className="font-semibold text-sm text-[#3b1553]">
                                         {formatCurrency(opt.perPiece)}/pc

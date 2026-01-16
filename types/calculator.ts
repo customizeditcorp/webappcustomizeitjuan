@@ -88,9 +88,11 @@ export interface OrderTotals {
 }
 
 export interface User {
-  username: string;
+  email: string;
   password: string;
   name: string;
+  role?: 'admin' | 'user';
+  createdAt?: string;
 }
 
 export interface SavedQuotation {
