@@ -93,6 +93,7 @@ export interface User {
   name: string;
   role?: 'admin' | 'user';
   createdAt?: string;
+  isTemporaryPassword?: boolean;
 }
 
 export interface SavedQuotation {

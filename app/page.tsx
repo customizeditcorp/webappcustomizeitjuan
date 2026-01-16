@@ -17,7 +17,7 @@ import { Copy, TrendingUp, Shirt, Scissors, X, Plus, Lock, FileText, LogIn, LogO
 import { CONFIG, EMBROIDERY_SELL_TIERS, SCREEN_PRINT_MATRIX } from '@/lib/constants';
 import { formatCurrency } from '@/lib/formatters';
 import { calculateEmbroidery, findClosestTier, calculateItemWithGlobalTier } from '@/lib/calculations';
-import { getCurrentUser, setCurrentUser as setCurrentUserStorage, logout as logoutUser, login as loginUser, register as registerUser, needsRegistration as needsUserRegistration, type User } from '@/lib/auth';
+import { getCurrentUser, setCurrentUser as setCurrentUserStorage, logout as logoutUser, login as loginUser, register as registerUser, needsRegistration as needsUserRegistration, changePassword as changeUserPassword, type User } from '@/lib/auth';
 import { saveQuotation, getQuotations, deleteQuotation } from '@/lib/storage';
 import type { Provider, ScreenPrintOrderItem, OrderTotals, SavedQuotation, ScreenPrintResult } from '@/types/calculator';
 
@@ -30,6 +30,9 @@ export default function TextilePriceCalculator() {
   const [loginPassword, setLoginPassword] = useState<string>('');
   const [loginName, setLoginName] = useState<string>('');
   const [isRegistering, setIsRegistering] = useState<boolean>(false);
+  const [isChangingPassword, setIsChangingPassword] = useState<boolean>(false);
+  const [newPassword, setNewPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [loginError, setLoginError] = useState<string>('');
 
 // ============================================
@@ -350,12 +353,21 @@ export default function TextilePriceCalculator() {
       // Modo login normal
       const user = loginUser(loginEmail, loginPassword);
       if (user) {
-        setCurrentUserStorage(user);
-        setCurrentUserState(user);
-        setLoginError('');
-        setLoginEmail('');
-        setLoginPassword('');
-        setIsRegistering(false);
+        // Verificar si tiene contraseña temporal
+        if (user.isTemporaryPassword) {
+          // Forzar cambio de contraseña
+          setIsChangingPassword(true);
+          setLoginError('');
+          // Mantener el usuario en estado pero no hacer login completo hasta cambiar password
+        } else {
+          // Login normal
+          setCurrentUserStorage(user);
+          setCurrentUserState(user);
+          setLoginError('');
+          setLoginEmail('');
+          setLoginPassword('');
+          setIsRegistering(false);
+        }
       } else {
         // Verificar si necesita registro
         if (loginEmail && needsUserRegistration(loginEmail)) {
@@ -365,6 +377,49 @@ export default function TextilePriceCalculator() {
           setLoginError('Email o contraseña incorrectos');
         }
       }
+    }
+  };
+
+  const handleChangePassword = () => {
+    if (!newPassword || !confirmPassword) {
+      setLoginError('Por favor completa ambos campos de contraseña');
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      setLoginError('Las contraseñas no coinciden');
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      setLoginError('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+    
+    // Obtener usuario actual (el que acaba de hacer login con password temporal)
+    const tempUser = loginUser(loginEmail, loginPassword);
+    if (!tempUser) {
+      setLoginError('Error: No se pudo verificar el usuario');
+      return;
+    }
+    
+    const result = changeUserPassword(loginEmail, loginPassword, newPassword);
+    if (result.success && result.user) {
+      // Login con la nueva contraseña
+      setCurrentUserStorage(result.user);
+      setCurrentUserState(result.user);
+      setLoginError('');
+      setLoginEmail('');
+      setLoginPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setIsChangingPassword(false);
+      toast.success('Contraseña actualizada', {
+        description: 'Tu contraseña ha sido cambiada exitosamente.',
+        duration: 3000,
+      });
+    } else {
+      setLoginError(result.message);
     }
   };
 
@@ -807,14 +862,18 @@ export default function TextilePriceCalculator() {
   // ============================================
   // 🔐 LOGIN SCREEN
   // ============================================
-  if (!currentUser) {
+  if (!currentUser || isChangingPassword) {
   return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-2xl text-center">Calculadora Customize It!</CardTitle>
             <CardDescription className="text-center">
-              {isRegistering ? 'Crea tu contraseña para continuar' : 'Inicia sesión para continuar'}
+              {isChangingPassword 
+                ? 'Debes cambiar tu contraseña temporal' 
+                : isRegistering 
+                  ? 'Crea tu contraseña para continuar' 
+                  : 'Inicia sesión para continuar'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -825,7 +884,16 @@ export default function TextilePriceCalculator() {
               </Alert>
             )}
             
-            {isRegistering && (
+            {isChangingPassword && (
+              <Alert className="bg-orange-50 border-orange-200">
+                <AlertCircle className="h-4 w-4 text-orange-600" />
+                <AlertDescription className="text-orange-800">
+                  <strong>Contraseña temporal detectada.</strong> Por seguridad, debes crear una nueva contraseña para continuar.
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            {isRegistering && !isChangingPassword && (
               <Alert className="bg-blue-50 border-blue-200">
                 <AlertCircle className="h-4 w-4 text-blue-600" />
                 <AlertDescription className="text-blue-800">
@@ -834,29 +902,73 @@ export default function TextilePriceCalculator() {
               </Alert>
             )}
             
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={loginEmail}
-                onChange={(e) => {
-                  setLoginEmail(e.target.value);
-                  setLoginError('');
-                  // Verificar si necesita registro cuando cambia el email
-                  if (e.target.value && needsUserRegistration(e.target.value)) {
-                    setIsRegistering(true);
-                  } else if (!e.target.value) {
-                    setIsRegistering(false);
-                  }
-                }}
-                placeholder="info@custimizeitca.com"
-                onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-                disabled={isRegistering}
-              />
-            </div>
+            {!isChangingPassword && (
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={loginEmail}
+                  onChange={(e) => {
+                    setLoginEmail(e.target.value);
+                    setLoginError('');
+                    // Verificar si necesita registro cuando cambia el email
+                    if (e.target.value && needsUserRegistration(e.target.value)) {
+                      setIsRegistering(true);
+                    } else if (!e.target.value) {
+                      setIsRegistering(false);
+                    }
+                  }}
+                  placeholder="customizeditcorp@gmail.com o info@custimizeitca.com"
+                  onKeyDown={(e) => e.key === 'Enter' && !isChangingPassword && handleLogin()}
+                  disabled={isRegistering || isChangingPassword}
+                />
+              </div>
+            )}
             
-            {isRegistering && (
+            {isChangingPassword && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="email-display">Email</Label>
+                  <Input
+                    id="email-display"
+                    type="email"
+                    value={loginEmail}
+                    disabled
+                    className="bg-gray-100"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="new-password">Nueva Contraseña</Label>
+                  <Input
+                    id="new-password"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Ingresa tu nueva contraseña"
+                    onKeyDown={(e) => e.key === 'Enter' && handleChangePassword()}
+                  />
+                  <p className="text-xs text-[#6B7280]">
+                    Mínimo 6 caracteres. Debe ser diferente a la contraseña temporal.
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password">Confirmar Nueva Contraseña</Label>
+                  <Input
+                    id="confirm-password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirma tu nueva contraseña"
+                    onKeyDown={(e) => e.key === 'Enter' && handleChangePassword()}
+                  />
+                </div>
+              </>
+            )}
+            
+            {!isChangingPassword && isRegistering && (
               <div className="space-y-2">
                 <Label htmlFor="name">Nombre</Label>
                 <Input
@@ -870,31 +982,38 @@ export default function TextilePriceCalculator() {
               </div>
             )}
             
-            <div className="space-y-2">
-              <Label htmlFor="password">
-                {isRegistering ? 'Nueva Contraseña' : 'Contraseña'}
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                placeholder="••••••••"
-                onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-              />
-              {isRegistering && (
-                <p className="text-xs text-[#6B7280]">
-                  Crea una contraseña segura para tu cuenta
-                </p>
-              )}
-            </div>
+            {!isChangingPassword && (
+              <div className="space-y-2">
+                <Label htmlFor="password">
+                  {isRegistering ? 'Nueva Contraseña' : 'Contraseña'}
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="••••••••"
+                  onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+                />
+                {isRegistering && (
+                  <p className="text-xs text-[#6B7280]">
+                    Crea una contraseña segura para tu cuenta
+                  </p>
+                )}
+              </div>
+            )}
             
             <Button 
-              onClick={handleLogin} 
+              onClick={isChangingPassword ? handleChangePassword : handleLogin} 
               className="w-full bg-[#FF6B35] hover:bg-[#FF8C61] text-white" 
               size="lg"
             >
-              {isRegistering ? (
+              {isChangingPassword ? (
+                <>
+                  <Lock className="w-4 h-4 mr-2" />
+                  Cambiar Contraseña
+                </>
+              ) : isRegistering ? (
                 <>
                   <Lock className="w-4 h-4 mr-2" />
                   Crear Contraseña
@@ -907,7 +1026,7 @@ export default function TextilePriceCalculator() {
               )}
             </Button>
             
-            {isRegistering && (
+            {isRegistering && !isChangingPassword && (
               <Button
                 variant="ghost"
                 onClick={() => {

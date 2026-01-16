@@ -4,12 +4,17 @@ export interface User {
   name: string;
   role?: 'admin' | 'user';
   createdAt?: string;
+  isTemporaryPassword?: boolean; // Indica si la contraseña es temporal y debe cambiarse
 }
 
-// Usuario admin inicial
-const ADMIN_EMAIL = 'info@custimizeitca.com';
-const ADMIN_PASSWORD = 'CustomizeIt2024!Admin'; // Password para admin
+// Usuarios iniciales con contraseñas temporales
+const ADMIN_EMAIL = 'customizeditcorp@gmail.com';
+const ADMIN_TEMP_PASSWORD = 'AdminTemp2024!'; // Contraseña provisional para admin
 const ADMIN_NAME = 'Administrador';
+
+const USER_EMAIL = 'info@custimizeitca.com';
+const USER_TEMP_PASSWORD = 'UserTemp2024!'; // Contraseña temporal para usuario
+const USER_NAME = 'Usuario';
 
 // Obtener usuarios desde localStorage
 const getStoredUsers = (): User[] => {
@@ -19,13 +24,22 @@ const getStoredUsers = (): User[] => {
     return JSON.parse(usersStr);
   }
   
-  // Inicializar con admin si no hay usuarios
+  // Inicializar con usuarios si no hay usuarios guardados
   const initialUsers: User[] = [
     {
       email: ADMIN_EMAIL,
-      password: ADMIN_PASSWORD,
+      password: ADMIN_TEMP_PASSWORD,
       name: ADMIN_NAME,
       role: 'admin',
+      isTemporaryPassword: true, // Marcar como temporal
+      createdAt: new Date().toISOString()
+    },
+    {
+      email: USER_EMAIL,
+      password: USER_TEMP_PASSWORD,
+      name: USER_NAME,
+      role: 'user',
+      isTemporaryPassword: true, // Marcar como temporal
       createdAt: new Date().toISOString()
     }
   ];
@@ -45,14 +59,41 @@ export const login = (email: string, password: string): User | null => {
   return user || null;
 };
 
+// Cambiar contraseña (de temporal a permanente)
+export const changePassword = (email: string, oldPassword: string, newPassword: string): { success: boolean; message: string; user?: User } => {
+  const users = getStoredUsers();
+  const emailLower = email.toLowerCase();
+  const user = users.find(u => u.email.toLowerCase() === emailLower);
+  
+  if (!user) {
+    return { success: false, message: 'Usuario no encontrado' };
+  }
+  
+  if (user.password !== oldPassword) {
+    return { success: false, message: 'Contraseña actual incorrecta' };
+  }
+  
+  if (oldPassword === newPassword) {
+    return { success: false, message: 'La nueva contraseña debe ser diferente a la actual' };
+  }
+  
+  // Actualizar contraseña y remover flag de temporal
+  user.password = newPassword;
+  user.isTemporaryPassword = false;
+  saveUsers(users);
+  
+  return { success: true, message: 'Contraseña actualizada exitosamente', user };
+};
+
 // Registrar nuevo usuario o actualizar password
 export const register = (email: string, password: string, name: string): { success: boolean; message: string; user?: User } => {
   const users = getStoredUsers();
   const emailLower = email.toLowerCase();
   
-  // Verificar si el email es el permitido
-  if (emailLower !== ADMIN_EMAIL.toLowerCase()) {
-    return { success: false, message: 'Email no autorizado. Solo se permite info@custimizeitca.com' };
+  // Verificar si el email está permitido
+  const allowedEmails = [ADMIN_EMAIL.toLowerCase(), USER_EMAIL.toLowerCase()];
+  if (!allowedEmails.includes(emailLower)) {
+    return { success: false, message: 'Email no autorizado. Solo se permiten emails predefinidos.' };
   }
   
   const existingUser = users.find(u => u.email.toLowerCase() === emailLower);
@@ -62,6 +103,7 @@ export const register = (email: string, password: string, name: string): { succe
     if (!existingUser.password || existingUser.password === '') {
       existingUser.password = password;
       existingUser.name = name || existingUser.name;
+      existingUser.isTemporaryPassword = false;
       saveUsers(users);
       return { success: true, message: 'Contraseña creada exitosamente', user: existingUser };
     } else {
@@ -74,6 +116,7 @@ export const register = (email: string, password: string, name: string): { succe
       password,
       name: name || 'Usuario',
       role: emailLower === ADMIN_EMAIL.toLowerCase() ? 'admin' : 'user',
+      isTemporaryPassword: false,
       createdAt: new Date().toISOString()
     };
     users.push(newUser);
