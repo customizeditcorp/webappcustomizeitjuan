@@ -919,7 +919,7 @@ export default function TextilePriceCalculator() {
                       setIsRegistering(false);
                     }
                   }}
-                  placeholder="customizeditcorp@gmail.com o info@custimizeitca.com"
+                  placeholder="customizeditcorp@gmail.com o info@customizeitca.com"
                   onKeyDown={(e) => e.key === 'Enter' && !isChangingPassword && handleLogin()}
                   disabled={isRegistering || isChangingPassword}
                 />

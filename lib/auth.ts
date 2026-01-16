@@ -12,7 +12,7 @@ const ADMIN_EMAIL = 'customizeditcorp@gmail.com';
 const ADMIN_TEMP_PASSWORD = 'AdminTemp2024!'; // Contraseña provisional para admin
 const ADMIN_NAME = 'Administrador';
 
-const USER_EMAIL = 'info@custimizeitca.com';
+const USER_EMAIL = 'info@customizeitca.com';
 const USER_TEMP_PASSWORD = 'UserTemp2024!'; // Contraseña temporal para usuario
 const USER_NAME = 'Usuario';
 
