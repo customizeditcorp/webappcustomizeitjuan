@@ -922,6 +922,7 @@ export default function TextilePriceCalculator() {
                   placeholder="customizeditcorp@gmail.com o info@customizeitca.com"
                   onKeyDown={(e) => e.key === 'Enter' && !isChangingPassword && handleLogin()}
                   disabled={isRegistering || isChangingPassword}
+                  className="text-gray-900"
                 />
               </div>
             )}
@@ -935,7 +936,7 @@ export default function TextilePriceCalculator() {
                     type="email"
                     value={loginEmail}
                     disabled
-                    className="bg-gray-100"
+                    className="bg-gray-100 text-gray-900"
                   />
                 </div>
                 
@@ -948,6 +949,7 @@ export default function TextilePriceCalculator() {
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Ingresa tu nueva contraseña"
                     onKeyDown={(e) => e.key === 'Enter' && handleChangePassword()}
+                    className="text-gray-900"
                   />
                   <p className="text-xs text-[#6B7280]">
                     Mínimo 6 caracteres. Debe ser diferente a la contraseña temporal.
@@ -963,6 +965,7 @@ export default function TextilePriceCalculator() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirma tu nueva contraseña"
                     onKeyDown={(e) => e.key === 'Enter' && handleChangePassword()}
+                    className="text-gray-900"
                   />
                 </div>
               </>
@@ -978,6 +981,7 @@ export default function TextilePriceCalculator() {
                   onChange={(e) => setLoginName(e.target.value)}
                   placeholder="Tu nombre completo"
                   onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+                  className="text-gray-900"
                 />
               </div>
             )}
@@ -994,6 +998,7 @@ export default function TextilePriceCalculator() {
                   onChange={(e) => setLoginPassword(e.target.value)}
                   placeholder="••••••••"
                   onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+                  className="text-gray-900"
                 />
                 {isRegistering && (
                   <p className="text-xs text-[#6B7280]">
@@ -1035,7 +1040,7 @@ export default function TextilePriceCalculator() {
                   setLoginPassword('');
                   setLoginName('');
                 }}
-                className="w-full"
+                className="w-full text-gray-900"
               >
                 Volver a Iniciar Sesión
               </Button>
@@ -1119,8 +1124,8 @@ export default function TextilePriceCalculator() {
                 {/* Client/Business Info */}
                 <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
                   <CardHeader>
-                    <CardTitle>Información del Cliente</CardTitle>
-                    <CardDescription>Datos obligatorios antes de agregar items</CardDescription>
+                    <CardTitle className="text-gray-900">Información del Cliente</CardTitle>
+                    <CardDescription className="text-slate-600">Datos obligatorios antes de agregar items</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
@@ -1131,7 +1136,7 @@ export default function TextilePriceCalculator() {
                         value={clientName}
                         onChange={(e) => setClientName(e.target.value)}
                         placeholder="Juan Pérez"
-                        className="focus:ring-2 focus:ring-primary"
+                        className="text-gray-900 focus:ring-2 focus:ring-primary"
                       />
                     </div>
                     <div className="space-y-2">
@@ -1142,7 +1147,7 @@ export default function TextilePriceCalculator() {
                         value={businessName}
                         onChange={(e) => setBusinessName(e.target.value)}
                         placeholder="Mi Empresa S.A."
-                        className="focus:ring-2 focus:ring-primary"
+                        className="text-gray-900 focus:ring-2 focus:ring-primary"
                       />
                     </div>
                   </CardContent>
@@ -1151,8 +1156,8 @@ export default function TextilePriceCalculator() {
                 {/* Item Configuration Form */}
                 <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
                   <CardHeader>
-                    <CardTitle>Configuración del Item</CardTitle>
-                    <CardDescription>Ingresa los detalles del producto</CardDescription>
+                    <CardTitle className="text-gray-900">Configuración del Item</CardTitle>
+                    <CardDescription className="text-slate-600">Ingresa los detalles del producto</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {/* Código, Color, Talla */}
@@ -1165,7 +1170,7 @@ export default function TextilePriceCalculator() {
                           value={spCode}
                           onChange={(e) => setSpCode(e.target.value)}
                           placeholder="G5000"
-                          className="focus:ring-2 focus:ring-primary"
+                          className="text-gray-900 focus:ring-2 focus:ring-primary"
                         />
                       </div>
                       <div className="space-y-2">
@@ -1176,13 +1181,13 @@ export default function TextilePriceCalculator() {
                           value={spColor}
                           onChange={(e) => setSpColor(e.target.value)}
                           placeholder="Negro"
-                          className="focus:ring-2 focus:ring-primary"
+                          className="text-gray-900 focus:ring-2 focus:ring-primary"
                         />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="sp-size" className="text-sm font-medium text-slate-700">Talla *</Label>
                         <Select value={spSize} onValueChange={setSpSize}>
-                          <SelectTrigger id="sp-size">
+                          <SelectTrigger id="sp-size" className="text-gray-900">
                             <SelectValue placeholder="Selecciona talla" />
                           </SelectTrigger>
                           <SelectContent>
@@ -1220,7 +1225,7 @@ export default function TextilePriceCalculator() {
                           value={spQuantity}
                           onChange={(e) => setSpQuantity(Number(e.target.value))}
                           min={1}
-                          className="focus:ring-2 focus:ring-primary"
+                          className="text-gray-900 focus:ring-2 focus:ring-primary"
                         />
                       </div>
                       <div className="space-y-2">
@@ -1232,7 +1237,7 @@ export default function TextilePriceCalculator() {
                           value={spBlankCost}
                           onChange={(e) => setSpBlankCost(Number(e.target.value))}
                           min={0}
-                          className="focus:ring-2 focus:ring-primary"
+                          className="text-gray-900 focus:ring-2 focus:ring-primary"
                         />
                       </div>
                     </div>
@@ -1243,14 +1248,14 @@ export default function TextilePriceCalculator() {
                         <Button
                           variant={spProvider === 'sanmar' ? 'default' : 'outline'}
                           onClick={() => setSpProvider('sanmar')}
-                          className="flex-1"
+                          className={`flex-1 ${spProvider === 'sanmar' ? 'text-white' : 'text-gray-900'}`}
                         >
                           SanMar (+3%)
                         </Button>
                         <Button
                           variant={spProvider === 'other' ? 'default' : 'outline'}
                           onClick={() => setSpProvider('other')}
-                          className="flex-1"
+                          className={`flex-1 ${spProvider === 'other' ? 'text-white' : 'text-gray-900'}`}
                         >
                           Otro
                         </Button>
@@ -1269,7 +1274,7 @@ export default function TextilePriceCalculator() {
                           onChange={(e) => setSpColorsFront(Number(e.target.value))}
                           min={0}
                           max={6}
-                          className="focus:ring-2 focus:ring-primary"
+                          className="text-gray-900 focus:ring-2 focus:ring-primary"
                         />
                       </div>
                       <div className="space-y-2">
@@ -1281,7 +1286,7 @@ export default function TextilePriceCalculator() {
                           onChange={(e) => setSpColorsBack(Number(e.target.value))}
                           min={0}
                           max={6}
-                          className="focus:ring-2 focus:ring-primary"
+                          className="text-gray-900 focus:ring-2 focus:ring-primary"
                         />
                       </div>
                     </div>
@@ -1306,7 +1311,7 @@ export default function TextilePriceCalculator() {
                           type="button"
                           variant={spDarkGarment ? "default" : "outline"}
                           onClick={() => setSpDarkGarment(true)}
-                          className="flex-1"
+                          className={`flex-1 ${spDarkGarment ? 'text-white' : 'text-gray-900'}`}
                         >
                           Sí (Base Blanca)
                         </Button>
@@ -1314,7 +1319,7 @@ export default function TextilePriceCalculator() {
                           type="button"
                           variant={!spDarkGarment ? "default" : "outline"}
                           onClick={() => setSpDarkGarment(false)}
-                          className="flex-1"
+                          className={`flex-1 ${!spDarkGarment ? 'text-white' : 'text-gray-900'}`}
                         >
                           No (Clara)
                         </Button>
@@ -1351,7 +1356,7 @@ export default function TextilePriceCalculator() {
                             setShowCustomMarkupInput(false);
                           }
                         }}
-                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm text-gray-900 shadow-xs transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         {markupPresets.map(preset => (
                           <option key={preset.value} value={preset.value}>
@@ -1385,6 +1390,7 @@ export default function TextilePriceCalculator() {
                               });
                             }}
                             size="sm"
+                            className="text-white"
                           >
                             Aplicar
                           </Button>
@@ -1577,7 +1583,7 @@ export default function TextilePriceCalculator() {
                 {orderItems.length > 0 && (
                   <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
                     <CardHeader>
-                      <CardTitle>Items en la Orden ({orderItems.length})</CardTitle>
+                      <CardTitle className="text-gray-900">Items en la Orden ({orderItems.length})</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
@@ -1636,16 +1642,16 @@ export default function TextilePriceCalculator() {
                 {orderItems.length === 0 ? (
                 <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
                   <CardHeader>
-                      <CardTitle>Resumen</CardTitle>
-                      <CardDescription>Agrega items a la orden para ver el resumen</CardDescription>
+                      <CardTitle className="text-gray-900">Resumen</CardTitle>
+                      <CardDescription className="text-slate-600">Agrega items a la orden para ver el resumen</CardDescription>
                     </CardHeader>
                   </Card>
                 ) : (
                   <>
                     <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
                       <CardHeader>
-                        <CardTitle>Resumen de la Orden</CardTitle>
-                        <CardDescription>
+                        <CardTitle className="text-gray-900">Resumen de la Orden</CardTitle>
+                        <CardDescription className="text-slate-600">
                           {orderTotals.totalPieces} piezas en {orderItems.length} items | Tier: {globalTier}
                         </CardDescription>
                   </CardHeader>
@@ -1678,7 +1684,7 @@ export default function TextilePriceCalculator() {
                               value={outboundShipping}
                               onChange={(e) => setOutboundShipping(Number(e.target.value))}
                               min={0}
-                              className="focus:ring-2 focus:ring-primary"
+                              className="text-gray-900 focus:ring-2 focus:ring-primary"
                             />
                           </div>
                         </div>
@@ -1743,7 +1749,7 @@ export default function TextilePriceCalculator() {
 
                     <div className="space-y-2 bg-slate-50 p-4 rounded-lg">
                       <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold">TOTAL FINAL</span>
+                        <span className="text-lg font-semibold text-gray-900">TOTAL FINAL</span>
                         <span className="text-2xl font-bold text-blue-600">
                               {formatCurrency(orderTotals.total)}
                         </span>
@@ -1752,7 +1758,7 @@ export default function TextilePriceCalculator() {
 
                         <Button
                           onClick={handleSaveQuotation}
-                          className="w-full"
+                          className="w-full text-gray-900"
                           variant="outline"
                         >
                           <Save className="w-4 h-4 mr-2" />
@@ -1764,11 +1770,11 @@ export default function TextilePriceCalculator() {
                     {/* Export Cards */}
                     <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
+                        <CardTitle className="flex items-center gap-2 text-gray-900">
                           <Lock className="w-4 h-4" />
                           🔒 ANÁLISIS INTERNO
                         </CardTitle>
-                        <CardDescription>
+                        <CardDescription className="text-slate-600">
                           Información completa con todos los costos
                         </CardDescription>
                       </CardHeader>
@@ -1784,7 +1790,7 @@ export default function TextilePriceCalculator() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="w-full"
+                          className="w-full text-gray-900"
                           onClick={() => setShowInternalPreview(!showInternalPreview)}
                         >
                           <Eye className="w-4 h-4 mr-2" />
@@ -1802,11 +1808,11 @@ export default function TextilePriceCalculator() {
 
                     <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
+                        <CardTitle className="flex items-center gap-2 text-gray-900">
                           <FileText className="w-4 h-4" />
                           📋 COTIZACIÓN CLIENTE
                         </CardTitle>
-                        <CardDescription>
+                        <CardDescription className="text-slate-600">
                           Información comercial para el cliente
                         </CardDescription>
                       </CardHeader>
@@ -1822,7 +1828,7 @@ export default function TextilePriceCalculator() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="w-full"
+                          className="w-full text-gray-900"
                           onClick={() => setShowClientPreview(!showClientPreview)}
                         >
                           <Eye className="w-4 h-4 mr-2" />
@@ -1840,8 +1846,8 @@ export default function TextilePriceCalculator() {
 
                     <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
                       <CardHeader>
-                        <CardTitle>SMS CLIENTE</CardTitle>
-                        <CardDescription>
+                        <CardTitle className="text-gray-900">SMS CLIENTE</CardTitle>
+                        <CardDescription className="text-slate-600">
                           Mensaje corto para WhatsApp/SMS
                         </CardDescription>
                       </CardHeader>
@@ -1857,7 +1863,7 @@ export default function TextilePriceCalculator() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="w-full"
+                          className="w-full text-gray-900"
                           onClick={() => setShowSMSPreview(!showSMSPreview)}
                         >
                           <MessageSquare className="w-4 h-4 mr-2" />
@@ -1885,8 +1891,8 @@ export default function TextilePriceCalculator() {
               <div className="lg:col-span-8 space-y-6">
                 <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
                   <CardHeader>
-                    <CardTitle>Configuración del Bordado</CardTitle>
-                    <CardDescription>Ingresa los detalles de las gorras</CardDescription>
+                    <CardTitle className="text-gray-900">Configuración del Bordado</CardTitle>
+                    <CardDescription className="text-slate-600">Ingresa los detalles de las gorras</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
@@ -1898,7 +1904,7 @@ export default function TextilePriceCalculator() {
                           value={embQuantity}
                           onChange={(e) => setEmbQuantity(Number(e.target.value))}
                           min={1}
-                          className="focus:ring-2 focus:ring-primary"
+                          className="text-gray-900 focus:ring-2 focus:ring-primary"
                         />
                       </div>
                       <div className="space-y-2">
@@ -1910,7 +1916,7 @@ export default function TextilePriceCalculator() {
                           value={embCapCost}
                           onChange={(e) => setEmbCapCost(Number(e.target.value))}
                           min={0}
-                          className="focus:ring-2 focus:ring-primary"
+                          className="text-gray-900 focus:ring-2 focus:ring-primary"
                         />
                         <p className="text-xs text-muted-foreground">Base incluida: ${CONFIG.EMB_BASE_CAP.toFixed(2)}</p>
                       </div>
@@ -1924,7 +1930,7 @@ export default function TextilePriceCalculator() {
                         value={embStitches}
                         onChange={(e) => setEmbStitches(Number(e.target.value))}
                         min={0}
-                        className="focus:ring-2 focus:ring-primary"
+                        className="text-gray-900 focus:ring-2 focus:ring-primary"
                       />
                       <p className="text-xs text-muted-foreground">
                         Base incluida: {CONFIG.EMB_STITCH_LIMIT.toLocaleString()} puntadas
@@ -1960,7 +1966,7 @@ export default function TextilePriceCalculator() {
                       return (
                         <Card className="mt-4">
                           <CardHeader>
-                            <CardTitle className="text-sm">
+                            <CardTitle className="text-sm text-gray-900">
                               💡 ¿Diseño más detallado?
                             </CardTitle>
                           </CardHeader>
@@ -2016,7 +2022,7 @@ export default function TextilePriceCalculator() {
                         value={outboundShipping}
                         onChange={(e) => setOutboundShipping(Number(e.target.value))}
                         min={0}
-                        className="focus:ring-2 focus:ring-primary"
+                        className="text-gray-900 focus:ring-2 focus:ring-primary"
                       />
                     </div>
 
@@ -2038,7 +2044,7 @@ export default function TextilePriceCalculator() {
                             setShowEmbCustomMarkupInput(false);
                           }
                         }}
-                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm text-gray-900 shadow-xs transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         {markupPresets.map(preset => (
                           <option key={preset.value} value={preset.value}>
@@ -2068,6 +2074,7 @@ export default function TextilePriceCalculator() {
                               setShowEmbCustomMarkupInput(false);
                             }}
                             size="sm"
+                            className="text-white"
                           >
                             Aplicar
                           </Button>
@@ -2123,8 +2130,8 @@ export default function TextilePriceCalculator() {
 
                 <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
                   <CardHeader>
-                    <CardTitle>Resumen de Venta</CardTitle>
-                    <CardDescription>Tier: {embroideryCalc.tier} unidades</CardDescription>
+                    <CardTitle className="text-gray-900">Resumen de Venta</CardTitle>
+                    <CardDescription className="text-slate-600">Tier: {embroideryCalc.tier} unidades</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2 text-sm">
@@ -2216,11 +2223,11 @@ export default function TextilePriceCalculator() {
                     {/* Export Cards */}
                     <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
+                        <CardTitle className="flex items-center gap-2 text-gray-900">
                           <Lock className="w-4 h-4" />
                           🔒 ANÁLISIS INTERNO
                         </CardTitle>
-                        <CardDescription>
+                        <CardDescription className="text-slate-600">
                           Información completa con todos los costos
                         </CardDescription>
                       </CardHeader>
@@ -2236,7 +2243,7 @@ export default function TextilePriceCalculator() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="w-full"
+                          className="w-full text-gray-900"
                           onClick={() => setShowInternalPreviewEmb(!showInternalPreviewEmb)}
                         >
                           <Eye className="w-4 h-4 mr-2" />
@@ -2254,11 +2261,11 @@ export default function TextilePriceCalculator() {
 
                     <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
+                        <CardTitle className="flex items-center gap-2 text-gray-900">
                           <FileText className="w-4 h-4" />
                           📋 COTIZACIÓN CLIENTE
                         </CardTitle>
-                        <CardDescription>
+                        <CardDescription className="text-slate-600">
                           Información comercial para el cliente
                         </CardDescription>
                       </CardHeader>
@@ -2274,7 +2281,7 @@ export default function TextilePriceCalculator() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="w-full"
+                          className="w-full text-gray-900"
                           onClick={() => setShowClientPreviewEmb(!showClientPreviewEmb)}
                         >
                           <Eye className="w-4 h-4 mr-2" />
@@ -2292,8 +2299,8 @@ export default function TextilePriceCalculator() {
 
                     <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
                       <CardHeader>
-                        <CardTitle>SMS CLIENTE</CardTitle>
-                        <CardDescription>
+                        <CardTitle className="text-gray-900">SMS CLIENTE</CardTitle>
+                        <CardDescription className="text-slate-600">
                           Mensaje corto para WhatsApp/SMS
                         </CardDescription>
                       </CardHeader>
@@ -2309,7 +2316,7 @@ export default function TextilePriceCalculator() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="w-full"
+                          className="w-full text-gray-900"
                           onClick={() => setShowSMSPreviewEmb(!showSMSPreviewEmb)}
                         >
                           <MessageSquare className="w-4 h-4 mr-2" />
@@ -2334,8 +2341,8 @@ export default function TextilePriceCalculator() {
           <TabsContent value="saved">
             <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
               <CardHeader>
-                <CardTitle>Cotizaciones Guardadas</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-gray-900">Cotizaciones Guardadas</CardTitle>
+                <CardDescription className="text-slate-600">
                   {savedQuotations.length} cotización{savedQuotations.length !== 1 ? 'es' : ''} guardada{savedQuotations.length !== 1 ? 's' : ''}
                 </CardDescription>
               </CardHeader>
