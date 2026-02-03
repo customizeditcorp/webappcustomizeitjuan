@@ -44,19 +44,21 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
-  
+
   /* Customize It! Brand Colors */
   --color-customize-orange: #FF6B35;
   --color-customize-orange-light: #FF8C61;
   --color-customize-purple: #3b1553;
-  --color-customize-purple-dark: #3f133a;
+  --color-customize-purple-dark: #2a0f3b;
+  --color-customize-purple-light: #5a2d7a;
   --color-customize-mint: #9de3c1;
+  --color-customize-mint-dark: #6bc99e;
   --color-customize-gray-mouse: #6B7280;
 }
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --background: oklch(0.975 0.002 250);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
@@ -130,4 +132,75 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Sidebar styles */
+.sidebar-nav-item {
+  @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer;
+}
+
+.sidebar-nav-item:hover {
+  @apply bg-white/10;
+}
+
+.sidebar-nav-item.active {
+  @apply bg-white/20 text-white shadow-lg;
+}
+
+/* Card accent borders */
+.card-accent-orange {
+  border-left: 4px solid #FF6B35;
+}
+
+.card-accent-purple {
+  border-left: 4px solid #3b1553;
+}
+
+.card-accent-mint {
+  border-left: 4px solid #9de3c1;
+}
+
+/* Scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Sticky summary */
+.sticky-summary {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+
+/* Badge styles */
+.badge-orange {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  background-color: rgba(255, 107, 53, 0.1);
+  color: #FF6B35;
+}
+
+.badge-purple {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  background-color: rgba(59, 21, 83, 0.1);
+  color: #3b1553;
+}
+
+.badge-mint {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  background-color: rgba(157, 227, 193, 0.2);
+  color: #059669;
 }

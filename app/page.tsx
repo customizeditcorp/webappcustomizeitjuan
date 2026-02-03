@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Toaster } from '@/components/ui/sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
-import { Copy, TrendingUp, Shirt, Scissors, X, Plus, Lock, FileText, LogIn, LogOut, Save, Trash2, Calendar, Eye, MessageSquare, AlertCircle } from 'lucide-react';
+import { Copy, TrendingUp, Shirt, Scissors, X, Plus, Lock, FileText, LogIn, LogOut, Save, Trash2, Calendar, Eye, MessageSquare, AlertCircle, Menu, ChevronRight, LayoutDashboard } from 'lucide-react';
 import { CONFIG, EMBROIDERY_SELL_TIERS, SCREEN_PRINT_MATRIX } from '@/lib/constants';
 import { formatCurrency } from '@/lib/formatters';
 import { calculateEmbroidery, findClosestTier, calculateItemWithGlobalTier } from '@/lib/calculations';
@@ -102,6 +102,7 @@ export default function TextilePriceCalculator() {
   // ============================================
   const [savedQuotations, setSavedQuotations] = useState<SavedQuotation[]>([]);
   const [selectedTab, setSelectedTab] = useState<string>('screen');
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   // ============================================
   // 👁️ EXPORT PREVIEWS (Screen Print)
@@ -864,16 +865,34 @@ export default function TextilePriceCalculator() {
   // ============================================
   if (!currentUser || isChangingPassword) {
   return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">Calculadora Customize It!</CardTitle>
+      <div className="min-h-screen bg-[#3b1553] flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          {/* Logo area */}
+          <div className="text-center mb-8">
+            <img
+              src="/customize_it_logo_web-07.png"
+              alt="Customize It!"
+              className="h-16 w-auto mx-auto mb-4"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+            <h1 className="text-3xl font-bold text-white">Calculadora de Precios</h1>
+            <p className="text-white/60 mt-2">Screen Printing & Bordado</p>
+          </div>
+        <Card className="w-full shadow-2xl border-0 rounded-2xl">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl text-center text-gray-900">
+              {isChangingPassword
+                ? 'Cambiar Contrasena'
+                : isRegistering
+                  ? 'Crear Contrasena'
+                  : 'Iniciar Sesion'}
+            </CardTitle>
             <CardDescription className="text-center">
-              {isChangingPassword 
-                ? 'Debes cambiar tu contraseña temporal' 
-                : isRegistering 
-                  ? 'Crea tu contraseña para continuar' 
-                  : 'Inicia sesión para continuar'}
+              {isChangingPassword
+                ? 'Debes cambiar tu contrasena temporal'
+                : isRegistering
+                  ? 'Crea tu contrasena para continuar'
+                  : 'Ingresa tus credenciales para continuar'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -1047,6 +1066,7 @@ export default function TextilePriceCalculator() {
             )}
           </CardContent>
         </Card>
+        </div>
       </div>
     );
   }
@@ -1054,78 +1074,177 @@ export default function TextilePriceCalculator() {
   // ============================================
   // 📱 MAIN CALCULATOR UI
   // ============================================
+
+  const navItems = [
+    { id: 'screen', label: 'Screen Print', icon: Shirt, color: 'text-[#FF6B35]' },
+    { id: 'embroidery', label: 'Bordado', icon: Scissors, color: 'text-[#9de3c1]' },
+    { id: 'saved', label: 'Cotizaciones', icon: Calendar, color: 'text-[#FF8C61]' },
+  ];
+
+  const currentNavItem = navItems.find(item => item.id === selectedTab) || navItems[0];
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-orange-50">
-      <div className="max-w-7xl mx-auto p-4">
-        {/* Header */}
-        <div className="mb-8 bg-white shadow-md rounded-lg p-4 md:p-6">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-4">
-              <img 
-                src="/customize_it_logo_web-07.png" 
-                alt="Customize It!" 
-                className="h-12 w-auto"
-                onError={(e) => {
-                  // Fallback si no existe el logo
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Calculadora de Precios</h1>
-                <p className="text-[#6B7280] text-sm">Screen Printing & Bordado</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-[#6B7280]">Hola, {currentUser.name}</span>
-              <Button 
-                variant="outline" 
-                onClick={handleLogout}
-                className="border-[#6B7280] text-[#6B7280] hover:bg-gray-50"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Cerrar Sesión
-              </Button>
-            </div>
-          </div>
+    <div className="min-h-screen bg-slate-100 flex">
+      {/* ============================================ */}
+      {/* SIDEBAR - Desktop */}
+      {/* ============================================ */}
+      <aside className="hidden lg:flex lg:flex-col lg:w-64 bg-[#3b1553] text-white fixed inset-y-0 left-0 z-40">
+        {/* Logo */}
+        <div className="p-6 border-b border-white/10">
+          <img
+            src="/customize_it_logo_web-07.png"
+            alt="Customize It!"
+            className="h-10 w-auto mb-2"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+          />
+          <p className="text-white/50 text-xs">Calculadora de Precios</p>
         </div>
 
-        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-          <TabsList className="grid w-full max-w-2xl grid-cols-3 mb-8 bg-white p-1 rounded-lg border border-gray-200">
-            <TabsTrigger 
-              value="screen" 
-              className="flex items-center gap-2 data-[state=active]:bg-[#FF6B35] data-[state=active]:text-white data-[state=inactive]:text-[#6B7280] data-[state=inactive]:border-[#6B7280] hover:border-[#FF6B35] transition-colors"
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-1 custom-scrollbar overflow-y-auto">
+          <p className="text-white/40 text-xs font-semibold uppercase tracking-wider px-4 mb-3">Menu</p>
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setSelectedTab(item.id)}
+              className={`sidebar-nav-item w-full ${selectedTab === item.id ? 'active' : 'text-white/70'}`}
             >
-              <Shirt className="w-4 h-4" />
-              Screen Print
-            </TabsTrigger>
-            <TabsTrigger 
-              value="embroidery" 
-              className="flex items-center gap-2 data-[state=active]:bg-[#FF6B35] data-[state=active]:text-white data-[state=inactive]:text-[#6B7280] data-[state=inactive]:border-[#6B7280] hover:border-[#FF6B35] transition-colors"
-            >
-              <Scissors className="w-4 h-4" />
-              Bordado
-            </TabsTrigger>
-            <TabsTrigger 
-              value="saved" 
-              className="flex items-center gap-2 data-[state=active]:bg-[#FF6B35] data-[state=active]:text-white data-[state=inactive]:text-[#6B7280] data-[state=inactive]:border-[#6B7280] hover:border-[#FF6B35] transition-colors"
-            >
-              <Calendar className="w-4 h-4" />
-              Cotizaciones Guardadas
-            </TabsTrigger>
-          </TabsList>
+              <item.icon className={`w-5 h-5 ${selectedTab === item.id ? 'text-white' : item.color}`} />
+              <span>{item.label}</span>
+              {selectedTab === item.id && <ChevronRight className="w-4 h-4 ml-auto" />}
+            </button>
+          ))}
+        </nav>
 
-          {/* ============================================ */}
-          {/* SCREEN PRINTING TAB */}
-          {/* ============================================ */}
-          <TabsContent value="screen">
+        {/* User info at bottom */}
+        <div className="p-4 border-t border-white/10">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 rounded-full bg-[#FF6B35] flex items-center justify-center text-white text-sm font-bold">
+              {currentUser.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white truncate">{currentUser.name}</p>
+              <p className="text-xs text-white/50 truncate">{currentUser.email}</p>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            onClick={handleLogout}
+            className="w-full justify-start text-white/60 hover:text-white hover:bg-white/10 px-2"
+            size="sm"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Cerrar Sesion
+          </Button>
+        </div>
+      </aside>
+
+      {/* ============================================ */}
+      {/* SIDEBAR - Mobile overlay */}
+      {/* ============================================ */}
+      {sidebarOpen && (
+        <div className="lg:hidden fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
+          <aside className="absolute inset-y-0 left-0 w-72 bg-[#3b1553] text-white flex flex-col shadow-2xl">
+            <div className="p-6 border-b border-white/10 flex items-center justify-between">
+              <div>
+                <img
+                  src="/customize_it_logo_web-07.png"
+                  alt="Customize It!"
+                  className="h-10 w-auto mb-1"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+                <p className="text-white/50 text-xs">Calculadora de Precios</p>
+              </div>
+              <button onClick={() => setSidebarOpen(false)} className="text-white/60 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <nav className="flex-1 p-4 space-y-1">
+              {navItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => { setSelectedTab(item.id); setSidebarOpen(false); }}
+                  className={`sidebar-nav-item w-full ${selectedTab === item.id ? 'active' : 'text-white/70'}`}
+                >
+                  <item.icon className={`w-5 h-5 ${selectedTab === item.id ? 'text-white' : item.color}`} />
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </nav>
+            <div className="p-4 border-t border-white/10">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full bg-[#FF6B35] flex items-center justify-center text-white text-sm font-bold">
+                  {currentUser.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-white truncate">{currentUser.name}</p>
+                  <p className="text-xs text-white/50 truncate">{currentUser.email}</p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                onClick={handleLogout}
+                className="w-full justify-start text-white/60 hover:text-white hover:bg-white/10 px-2"
+                size="sm"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Cerrar Sesion
+              </Button>
+            </div>
+          </aside>
+        </div>
+      )}
+
+      {/* ============================================ */}
+      {/* MAIN CONTENT */}
+      {/* ============================================ */}
+      <div className="flex-1 lg:ml-64">
+        {/* Top Header Bar */}
+        <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
+          <div className="flex items-center justify-between px-4 md:px-6 h-16">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden p-2 rounded-lg hover:bg-slate-100 text-gray-600"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-2 text-sm">
+                <LayoutDashboard className="w-4 h-4 text-[#6B7280]" />
+                <span className="text-[#6B7280]">Dashboard</span>
+                <ChevronRight className="w-3 h-3 text-[#6B7280]" />
+                <span className="font-medium text-gray-900">{currentNavItem.label}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="hidden sm:inline text-sm text-[#6B7280]">
+                {currentUser.name}
+              </span>
+              <div className="w-8 h-8 rounded-full bg-[#3b1553] flex items-center justify-center text-white text-sm font-bold lg:hidden">
+                {currentUser.name.charAt(0).toUpperCase()}
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <main className="p-4 md:p-6 max-w-7xl mx-auto">
+
+        {/* ============================================ */}
+        {/* SCREEN PRINTING SECTION */}
+        {/* ============================================ */}
+        {selectedTab === 'screen' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Left Column - Form + Items List */}
               <div className="lg:col-span-8 space-y-6">
                 {/* Client/Business Info */}
-                <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
+                <Card className="bg-white rounded-2xl border border-slate-200 shadow-sm card-accent-orange">
                   <CardHeader>
-                    <CardTitle className="text-gray-900">Información del Cliente</CardTitle>
-                    <CardDescription className="text-slate-600">Datos obligatorios antes de agregar items</CardDescription>
+                    <CardTitle className="text-gray-900 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-[#FF6B35]" />
+                      Informacion del Cliente
+                    </CardTitle>
+                    <CardDescription className="text-slate-500">Datos obligatorios antes de agregar items</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
@@ -1154,10 +1273,13 @@ export default function TextilePriceCalculator() {
                 </Card>
 
                 {/* Item Configuration Form */}
-                <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
+                <Card className="bg-white rounded-2xl border border-slate-200 shadow-sm card-accent-purple">
                   <CardHeader>
-                    <CardTitle className="text-gray-900">Configuración del Item</CardTitle>
-                    <CardDescription className="text-slate-600">Ingresa los detalles del producto</CardDescription>
+                    <CardTitle className="text-gray-900 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-[#3b1553]" />
+                      Configuracion del Item
+                    </CardTitle>
+                    <CardDescription className="text-slate-500">Ingresa los detalles del producto</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {/* Código, Color, Talla */}
@@ -1581,9 +1703,12 @@ export default function TextilePriceCalculator() {
 
                 {/* Items List */}
                 {orderItems.length > 0 && (
-                  <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
+                  <Card className="bg-white rounded-2xl border border-slate-200 shadow-sm card-accent-mint">
                     <CardHeader>
-                      <CardTitle className="text-gray-900">Items en la Orden ({orderItems.length})</CardTitle>
+                      <CardTitle className="text-gray-900 flex items-center gap-2">
+                        Items en la Orden
+                        <span className="badge-orange">{orderItems.length}</span>
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
@@ -1638,22 +1763,24 @@ export default function TextilePriceCalculator() {
               </div>
 
               {/* Right Column - Summary + Export */}
-              <div className="lg:col-span-4 space-y-6 sticky top-4">
+              <div className="lg:col-span-4 sticky-summary space-y-6">
                 {orderItems.length === 0 ? (
-                <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
+                <Card className="bg-white rounded-2xl border border-slate-200 shadow-sm">
                   <CardHeader>
                       <CardTitle className="text-gray-900">Resumen</CardTitle>
-                      <CardDescription className="text-slate-600">Agrega items a la orden para ver el resumen</CardDescription>
+                      <CardDescription className="text-slate-500">Agrega items a la orden para ver el resumen</CardDescription>
                     </CardHeader>
                   </Card>
                 ) : (
                   <>
-                    <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
+                    <Card className="bg-white rounded-2xl border border-slate-200 shadow-sm">
                       <CardHeader>
                         <CardTitle className="text-gray-900">Resumen de la Orden</CardTitle>
-                        <CardDescription className="text-slate-600">
-                          {orderTotals.totalPieces} piezas en {orderItems.length} items | Tier: {globalTier}
-                        </CardDescription>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          <span className="badge-orange">{orderTotals.totalPieces} piezas</span>
+                          <span className="badge-purple">{orderItems.length} items</span>
+                          <span className="badge-mint">Tier: {globalTier}</span>
+                        </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2 text-sm">
@@ -1768,37 +1895,35 @@ export default function TextilePriceCalculator() {
                     </Card>
 
                     {/* Export Cards */}
-                    <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-gray-900">
-                          <Lock className="w-4 h-4" />
-                          🔒 ANÁLISIS INTERNO
+                    <Card className="bg-white rounded-2xl border border-slate-200 shadow-sm card-accent-purple">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-gray-900 text-base">
+                          <Lock className="w-4 h-4 text-[#3b1553]" />
+                          Analisis Interno
                         </CardTitle>
-                        <CardDescription className="text-slate-600">
-                          Información completa con todos los costos
-                        </CardDescription>
                       </CardHeader>
-                      <CardContent className="space-y-3">
+                      <CardContent className="space-y-2">
                         <Button
                           variant="outline"
                           className="w-full border-[#3b1553] text-[#3b1553] hover:bg-purple-50"
-                          onClick={() => copyToClipboard(generateInternalExport(), "Análisis Interno")}
+                          onClick={() => copyToClipboard(generateInternalExport(), "Analisis Interno")}
+                          size="sm"
                         >
                           <Copy className="w-4 h-4 mr-2" />
-                          Copiar Análisis Interno
+                          Copiar
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="w-full text-gray-900"
+                          className="w-full text-gray-500"
                           onClick={() => setShowInternalPreview(!showInternalPreview)}
                         >
                           <Eye className="w-4 h-4 mr-2" />
-                          {showInternalPreview ? 'Ocultar' : 'Ver'} Previsualización
+                          {showInternalPreview ? 'Ocultar' : 'Vista previa'}
                         </Button>
                         {showInternalPreview && (
-                          <div className="mt-3 p-3 bg-white rounded-lg border max-h-96 overflow-y-auto">
-                            <pre className="text-xs whitespace-pre-wrap font-mono">
+                          <div className="mt-2 p-3 bg-slate-50 rounded-lg border max-h-64 overflow-y-auto">
+                            <pre className="text-xs whitespace-pre-wrap font-mono text-gray-700">
                               {generateInternalExport()}
                             </pre>
                           </div>
@@ -1806,37 +1931,35 @@ export default function TextilePriceCalculator() {
                       </CardContent>
                     </Card>
 
-                    <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-gray-900">
-                          <FileText className="w-4 h-4" />
-                          📋 COTIZACIÓN CLIENTE
+                    <Card className="bg-white rounded-2xl border border-slate-200 shadow-sm card-accent-orange">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-gray-900 text-base">
+                          <FileText className="w-4 h-4 text-[#FF6B35]" />
+                          Cotizacion Cliente
                         </CardTitle>
-                        <CardDescription className="text-slate-600">
-                          Información comercial para el cliente
-                        </CardDescription>
                       </CardHeader>
-                      <CardContent className="space-y-3">
+                      <CardContent className="space-y-2">
                         <Button
                           variant="outline"
                           className="w-full border-[#FF6B35] text-[#FF6B35] hover:bg-orange-50"
-                          onClick={() => copyToClipboard(generateClientExport(), "Cotización Cliente")}
+                          onClick={() => copyToClipboard(generateClientExport(), "Cotizacion Cliente")}
+                          size="sm"
                         >
                           <Copy className="w-4 h-4 mr-2" />
-                          Copiar Cotización Cliente
+                          Copiar
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="w-full text-gray-900"
+                          className="w-full text-gray-500"
                           onClick={() => setShowClientPreview(!showClientPreview)}
                         >
                           <Eye className="w-4 h-4 mr-2" />
-                          {showClientPreview ? 'Ocultar' : 'Ver'} Previsualización
+                          {showClientPreview ? 'Ocultar' : 'Vista previa'}
                         </Button>
                         {showClientPreview && (
-                          <div className="mt-3 p-3 bg-white rounded-lg border max-h-96 overflow-y-auto">
-                            <pre className="text-xs whitespace-pre-wrap font-mono">
+                          <div className="mt-2 p-3 bg-slate-50 rounded-lg border max-h-64 overflow-y-auto">
+                            <pre className="text-xs whitespace-pre-wrap font-mono text-gray-700">
                               {generateClientExport()}
                             </pre>
                           </div>
@@ -1844,18 +1967,19 @@ export default function TextilePriceCalculator() {
                       </CardContent>
                     </Card>
 
-                    <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
-                      <CardHeader>
-                        <CardTitle className="text-gray-900">SMS CLIENTE</CardTitle>
-                        <CardDescription className="text-slate-600">
-                          Mensaje corto para WhatsApp/SMS
-                        </CardDescription>
+                    <Card className="bg-white rounded-2xl border border-slate-200 shadow-sm card-accent-mint">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-gray-900 text-base">
+                          <MessageSquare className="w-4 h-4 text-emerald-600" />
+                          SMS / WhatsApp
+                        </CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-3">
+                      <CardContent className="space-y-2">
                         <Button
                           variant="outline"
-                          className="w-full border-[#9de3c1] text-[#9de3c1] hover:bg-emerald-50"
+                          className="w-full border-emerald-500 text-emerald-600 hover:bg-emerald-50"
                           onClick={() => copyToClipboard(generateSMSExport(), "SMS")}
+                          size="sm"
                         >
                           <Copy className="w-4 h-4 mr-2" />
                           Copiar SMS
@@ -1863,15 +1987,15 @@ export default function TextilePriceCalculator() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="w-full text-gray-900"
+                          className="w-full text-gray-500"
                           onClick={() => setShowSMSPreview(!showSMSPreview)}
                         >
                           <MessageSquare className="w-4 h-4 mr-2" />
-                          {showSMSPreview ? 'Ocultar' : 'Ver'} Previsualización
+                          {showSMSPreview ? 'Ocultar' : 'Vista previa'}
                         </Button>
                         {showSMSPreview && (
-                          <div className="mt-3 p-3 bg-white rounded-lg border">
-                            <p className="text-sm">{generateSMSExport()}</p>
+                          <div className="mt-2 p-3 bg-slate-50 rounded-lg border">
+                            <p className="text-sm text-gray-700">{generateSMSExport()}</p>
                       </div>
                         )}
                   </CardContent>
@@ -1880,19 +2004,22 @@ export default function TextilePriceCalculator() {
                 )}
               </div>
             </div>
-          </TabsContent>
+          )}
 
           {/* ============================================ */}
-          {/* EMBROIDERY TAB */}
+          {/* EMBROIDERY SECTION */}
           {/* ============================================ */}
-          <TabsContent value="embroidery">
+          {selectedTab === 'embroidery' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Left Column - Inputs */}
               <div className="lg:col-span-8 space-y-6">
-                <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
+                <Card className="bg-white rounded-2xl border border-slate-200 shadow-sm card-accent-purple">
                   <CardHeader>
-                    <CardTitle className="text-gray-900">Configuración del Bordado</CardTitle>
-                    <CardDescription className="text-slate-600">Ingresa los detalles de las gorras</CardDescription>
+                    <CardTitle className="text-gray-900 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-[#3b1553]" />
+                      Configuracion del Bordado
+                    </CardTitle>
+                    <CardDescription className="text-slate-500">Ingresa los detalles de las gorras</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
@@ -2094,9 +2221,12 @@ export default function TextilePriceCalculator() {
                 </Card>
 
                 {/* Pricing Strategy Info */}
-                <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
+                <Card className="bg-white rounded-2xl border border-slate-200 shadow-sm card-accent-mint">
                   <CardHeader>
-                    <CardTitle className="text-blue-900">Estrategia de Mercado</CardTitle>
+                    <CardTitle className="text-gray-900 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-[#9de3c1]" />
+                      Estrategia de Mercado
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2 text-sm">
@@ -2116,7 +2246,7 @@ export default function TextilePriceCalculator() {
               </div>
 
               {/* Right Column - Summary */}
-              <div className="lg:col-span-4 space-y-6 sticky top-4">
+              <div className="lg:col-span-4 sticky-summary space-y-6">
                 {embroideryCalc.upsellData && (
                   <Alert className="bg-green-50 border-green-200">
                     <TrendingUp className="h-4 w-4 text-green-600" />
@@ -2128,10 +2258,13 @@ export default function TextilePriceCalculator() {
                   </Alert>
                 )}
 
-                <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
+                <Card className="bg-white rounded-2xl border border-slate-200 shadow-sm">
                   <CardHeader>
                     <CardTitle className="text-gray-900">Resumen de Venta</CardTitle>
-                    <CardDescription className="text-slate-600">Tier: {embroideryCalc.tier} unidades</CardDescription>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      <span className="badge-purple">Tier: {embroideryCalc.tier}</span>
+                      <span className="badge-orange">{embQuantity} gorras</span>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2 text-sm">
@@ -2221,37 +2354,35 @@ export default function TextilePriceCalculator() {
                     <Separator />
 
                     {/* Export Cards */}
-                    <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-gray-900">
-                          <Lock className="w-4 h-4" />
-                          🔒 ANÁLISIS INTERNO
+                    <Card className="bg-white rounded-2xl border border-slate-200 shadow-sm card-accent-purple">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-gray-900 text-base">
+                          <Lock className="w-4 h-4 text-[#3b1553]" />
+                          Analisis Interno
                         </CardTitle>
-                        <CardDescription className="text-slate-600">
-                          Información completa con todos los costos
-                        </CardDescription>
                       </CardHeader>
-                      <CardContent className="space-y-3">
+                      <CardContent className="space-y-2">
                         <Button
                           variant="outline"
                           className="w-full border-[#3b1553] text-[#3b1553] hover:bg-purple-50"
-                          onClick={() => copyToClipboard(generateInternalExportEmbroidery(), "Análisis Interno")}
+                          onClick={() => copyToClipboard(generateInternalExportEmbroidery(), "Analisis Interno")}
+                          size="sm"
                         >
                           <Copy className="w-4 h-4 mr-2" />
-                          Copiar Análisis Interno
+                          Copiar
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="w-full text-gray-900"
+                          className="w-full text-gray-500"
                           onClick={() => setShowInternalPreviewEmb(!showInternalPreviewEmb)}
                         >
                           <Eye className="w-4 h-4 mr-2" />
-                          {showInternalPreviewEmb ? 'Ocultar' : 'Ver'} Previsualización
+                          {showInternalPreviewEmb ? 'Ocultar' : 'Vista previa'}
                         </Button>
                         {showInternalPreviewEmb && (
-                          <div className="mt-3 p-3 bg-white rounded-lg border max-h-96 overflow-y-auto">
-                            <pre className="text-xs whitespace-pre-wrap font-mono">
+                          <div className="mt-2 p-3 bg-slate-50 rounded-lg border max-h-64 overflow-y-auto">
+                            <pre className="text-xs whitespace-pre-wrap font-mono text-gray-700">
                               {generateInternalExportEmbroidery()}
                             </pre>
                           </div>
@@ -2259,37 +2390,35 @@ export default function TextilePriceCalculator() {
                       </CardContent>
                     </Card>
 
-                    <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-gray-900">
-                          <FileText className="w-4 h-4" />
-                          📋 COTIZACIÓN CLIENTE
+                    <Card className="bg-white rounded-2xl border border-slate-200 shadow-sm card-accent-orange">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-gray-900 text-base">
+                          <FileText className="w-4 h-4 text-[#FF6B35]" />
+                          Cotizacion Cliente
                         </CardTitle>
-                        <CardDescription className="text-slate-600">
-                          Información comercial para el cliente
-                        </CardDescription>
                       </CardHeader>
-                      <CardContent className="space-y-3">
+                      <CardContent className="space-y-2">
                         <Button
                           variant="outline"
                           className="w-full border-[#FF6B35] text-[#FF6B35] hover:bg-orange-50"
-                          onClick={() => copyToClipboard(generateClientExportEmbroidery(), "Cotización Cliente")}
+                          onClick={() => copyToClipboard(generateClientExportEmbroidery(), "Cotizacion Cliente")}
+                          size="sm"
                         >
                           <Copy className="w-4 h-4 mr-2" />
-                          Copiar Cotización Cliente
+                          Copiar
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="w-full text-gray-900"
+                          className="w-full text-gray-500"
                           onClick={() => setShowClientPreviewEmb(!showClientPreviewEmb)}
                         >
                           <Eye className="w-4 h-4 mr-2" />
-                          {showClientPreviewEmb ? 'Ocultar' : 'Ver'} Previsualización
+                          {showClientPreviewEmb ? 'Ocultar' : 'Vista previa'}
                         </Button>
                         {showClientPreviewEmb && (
-                          <div className="mt-3 p-3 bg-white rounded-lg border max-h-96 overflow-y-auto">
-                            <pre className="text-xs whitespace-pre-wrap font-mono">
+                          <div className="mt-2 p-3 bg-slate-50 rounded-lg border max-h-64 overflow-y-auto">
+                            <pre className="text-xs whitespace-pre-wrap font-mono text-gray-700">
                               {generateClientExportEmbroidery()}
                             </pre>
                           </div>
@@ -2297,18 +2426,19 @@ export default function TextilePriceCalculator() {
                       </CardContent>
                     </Card>
 
-                    <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
-                      <CardHeader>
-                        <CardTitle className="text-gray-900">SMS CLIENTE</CardTitle>
-                        <CardDescription className="text-slate-600">
-                          Mensaje corto para WhatsApp/SMS
-                        </CardDescription>
+                    <Card className="bg-white rounded-2xl border border-slate-200 shadow-sm card-accent-mint">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-gray-900 text-base">
+                          <MessageSquare className="w-4 h-4 text-emerald-600" />
+                          SMS / WhatsApp
+                        </CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-3">
+                      <CardContent className="space-y-2">
                         <Button
                           variant="outline"
-                          className="w-full border-[#9de3c1] text-[#9de3c1] hover:bg-emerald-50"
+                          className="w-full border-emerald-500 text-emerald-600 hover:bg-emerald-50"
                           onClick={() => copyToClipboard(generateSMSExportEmbroidery(), "SMS")}
+                          size="sm"
                         >
                           <Copy className="w-4 h-4 mr-2" />
                           Copiar SMS
@@ -2316,15 +2446,15 @@ export default function TextilePriceCalculator() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="w-full text-gray-900"
+                          className="w-full text-gray-500"
                           onClick={() => setShowSMSPreviewEmb(!showSMSPreviewEmb)}
                         >
                           <MessageSquare className="w-4 h-4 mr-2" />
-                          {showSMSPreviewEmb ? 'Ocultar' : 'Ver'} Previsualización
+                          {showSMSPreviewEmb ? 'Ocultar' : 'Vista previa'}
                         </Button>
                         {showSMSPreviewEmb && (
-                          <div className="mt-3 p-3 bg-white rounded-lg border">
-                            <p className="text-sm">{generateSMSExportEmbroidery()}</p>
+                          <div className="mt-2 p-3 bg-slate-50 rounded-lg border">
+                            <p className="text-sm text-gray-700">{generateSMSExportEmbroidery()}</p>
                       </div>
                         )}
                       </CardContent>
@@ -2333,17 +2463,20 @@ export default function TextilePriceCalculator() {
                 </Card>
               </div>
             </div>
-          </TabsContent>
+          )}
 
           {/* ============================================ */}
-          {/* SAVED QUOTATIONS TAB */}
+          {/* SAVED QUOTATIONS SECTION */}
           {/* ============================================ */}
-          <TabsContent value="saved">
-            <Card className="bg-white rounded-xl border border-slate-200 shadow-sm">
+          {selectedTab === 'saved' && (
+            <Card className="bg-white rounded-2xl border border-slate-200 shadow-sm card-accent-orange">
               <CardHeader>
-                <CardTitle className="text-gray-900">Cotizaciones Guardadas</CardTitle>
-                <CardDescription className="text-slate-600">
-                  {savedQuotations.length} cotización{savedQuotations.length !== 1 ? 'es' : ''} guardada{savedQuotations.length !== 1 ? 's' : ''}
+                <CardTitle className="text-gray-900 flex items-center gap-2">
+                  Cotizaciones Guardadas
+                  <span className="badge-orange">{savedQuotations.length}</span>
+                </CardTitle>
+                <CardDescription className="text-slate-500">
+                  {savedQuotations.length} cotizacion{savedQuotations.length !== 1 ? 'es' : ''} guardada{savedQuotations.length !== 1 ? 's' : ''}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -2409,8 +2542,9 @@ export default function TextilePriceCalculator() {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          )}
+
+        </main>
       </div>
       <Toaster />
     </div>
